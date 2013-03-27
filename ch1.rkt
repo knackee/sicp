@@ -83,7 +83,64 @@
 ; Exercise 1.7
 ; Small numbers: The effectiveness of (sqrt) goes down the closer the radicand
 ; is to the tolerance.
+;
 ; Large numbers: (sqrt 1e49) loops forever. (improve) returns the same guess.
 ; (improve 3.162277660168379e+024 1e49) => 3.162277660168379e+024
 ; This is the correct answer but the floating point representation of this
 ; number is not within a precision of 0.001.
+; Large numbers 2: The reason (improve) is continuously called is (good-enough?)
+; returns #f for a correct guess of 3.162277660168379e+024.
+;
+; Improved version of good-enough? compares the previous and current guess. This
+; version works for very small and very large numbers (e.g.: .0000002 and 1e49).
+(define (sqrt-iter-2 prev-guess guess x)
+  (display guess) (newline)
+  (if (good-enough?-2 prev-guess guess)
+      guess
+      (sqrt-iter-2 guess (improve guess x) x)))
+(define (good-enough?-2 prev-guess guess)
+  (< (/ (abs (- guess prev-guess)) guess) 0.001))
+(define (sqrt-2 x)
+  (sqrt-iter-2 0.0 1.0 x))
+
+; Exercise 1.8: Newton's method for cube roots
+(define (cubert-iter prev-guess guess x)
+  (display guess) (newline)
+  (if (good-enough-cubert? prev-guess guess)
+      guess
+      (cubert-iter guess (improve-cubert guess x) x)))
+(define (improve-cubert guess x)
+  (/ (+ (/ x (* guess guess)) (* 2 guess)) 3))
+(define (good-enough-cubert? prev-guess guess)
+  (< (/ (abs (- guess prev-guess)) guess) 0.001))
+(define (cubert x)
+  (cubert-iter 0.0 1.0 x))
+
+; Excercise 1.9: Determine whether process is iterative or recursive using the
+; substitution model.
+;
+; (define (+ a b)
+;   (if (= a 0) b (inc (dec a) b))))
+; This a recursive process with deferred (inc) operations.
+;
+; (define (+ a b)
+;   (if (= a 0) (+ (dec a) (inc b))))
+; This is an interative process with changing state variables.
+
+; Exercise 1.10: Ackermann's function
+(define (acker x y)
+  (display "(acker ") (display x) (display " ") (display y) (display ")\n")
+  (cond ((= y 0) (display 0) (newline) 0)
+        ((= x 0) (display (* 2 y)) (newline) (* 2 y))
+        ((= y 1) (display 2) (newline) 2)
+        (else (display "Recur\n") (acker (- x 1) (acker x (- y 1))))))
+
+(acker 1 10) ; =>  1024
+(acker 2 4)  ; => 65536
+(acker 3 3)  ; => 65536
+
+(define (f n) (acker 0 n))  ; => 2n   (multiplication)
+(define (g n) (acker 1 n))  ; => 2^n  (exponentiation)
+(define (h n) (acker 2 n))  ; => 2^^n (tetration)
+(define (k n) (* 5 n n))    ; => 5n^2
+
