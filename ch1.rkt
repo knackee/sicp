@@ -144,3 +144,17 @@
 (define (h n) (acker 2 n))  ; => 2^^n (tetration)
 (define (k n) (* 5 n n))    ; => 5n^2
 
+; Example: Counting Change
+; Number of ways to change an amount using 50c, 25c, 10c, 5c, and 1c.
+
+(define (change a n)
+  (cond ((= a 0) 1)
+        ((< a 0) 0)
+        ((= n 0) 0)
+        (else (+ (change a (- n 1))
+                 (cond ((= n 5) (change (- a 50) n))
+                       ((= n 4) (change (- a 25) n))
+                       ((= n 3) (change (- a 10) n))
+                       ((= n 2) (change (- a  5) n))
+                       ((= n 1) (change (- a  1) n)))))))
+                   
